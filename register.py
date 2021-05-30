@@ -1,11 +1,15 @@
 from tyk.decorators import *
 from gateway import TykGateway as tyk
+
+import os
+import sys
+parent_dir = os.path.abspath(os.path.dirname(__file__))
+for vendor_dir in [ 'vendor/lib/python3.6/site-packages/', 'vendor/lib64/python3.6/site-packages/' ]:
+  sys.path.append(vendor_dir)
+
 import jwt
 #import redis
-#from datetime import timedelta, datetime
 import datetime
-#from time import time
-#from pprint import pprint
 
 @Hook
 def ResponseHook(request, response, session, metadata, spec):

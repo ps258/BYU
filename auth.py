@@ -1,5 +1,12 @@
 from tyk.decorators import *
 from gateway import TykGateway as tyk
+
+import os
+import sys
+parent_dir = os.path.abspath(os.path.dirname(__file__))
+for vendor_dir in [ 'vendor/lib/python3.6/site-packages/', 'vendor/lib64/python3.6/site-packages/' ]:
+  sys.path.append(vendor_dir)
+
 import jwt
 
 @Hook
