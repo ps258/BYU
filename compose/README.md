@@ -25,7 +25,7 @@ docker container exec compose_tyk_build_1 apt-get install zip unzip -qy
 docker container exec compose_tyk_build_1 /root/plugin/mkvendor.sh
 ```
 
-### Build and publish the plugins
+### Build and serve the plugins
 ```bash
 docker container exec -it compose_tyk_build_1 /root/plugin/build.sh
 ```
