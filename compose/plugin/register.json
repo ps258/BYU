@@ -1,0 +1,13 @@
+{
+  "file_list": [
+    "register.py"
+  ],
+  "custom_middleware": {
+    "driver": "python",
+    "response": [
+    {
+      "name": "ResponseHook"
+    }
+    ]
+  }
+}

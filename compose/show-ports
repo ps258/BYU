@@ -1,0 +1,33 @@
+#!/bin/bash
+
+DASHBOARD=$(uname -n)
+GATEWAY=$(uname -n)
+DASHBOARD=10.0.0.6
+GATEWAY=10.0.0.6
+DASHBOARD_PROTO=http
+GATEWAY_PROTO=http
+
+#dashboardPort=$(docker inspect --format='{{(index (index .NetworkSettings.Ports "3000/tcp") 0).HostPort}}' tyk-env_dashboard_1)
+dashboardPort=$(docker inspect --format='{{(index (index .NetworkSettings.Ports "3000/tcp") 0).HostPort}}' compose_tyk_dashboard_1)
+
+echo Dashboard: compose_tyk_dashboard_1
+echo $DASHBOARD_PROTO://$DASHBOARD:$dashboardPort
+
+echo
+
+echo Gateways:
+for GW in 1
+do
+  GWPort=$(docker inspect --format='{{(index (index .NetworkSettings.Ports "8080/tcp") 0).HostPort}}' compose_tyk_gateway_1)
+  echo "compose_tyk_gateway_1 -> $GATEWAY_PROTO://$GATEWAY:$GWPort"
+done
+
+echo
+
+for GW in 1
+do
+  GWPort=$(docker inspect --format='{{(index (index .NetworkSettings.Ports "8080/tcp") 0).HostPort}}' compose_tyk_gateway_1)
+  echo curl -k $GATEWAY_PROTO://$GATEWAY:$GWPort/hello
+  result=$(curl -sk $GATEWAY_PROTO://$GATEWAY:$GWPort/hello)
+  echo $result
+done

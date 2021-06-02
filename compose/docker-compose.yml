@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  redis:
+    image: redis:4.0-alpine
+    expose:
+      - "6379"
+  mongo:
+    image: mongo:latest
+    expose:
+      - "27017"
+  tyk_dashboard:
+    image: tykio/tyk-dashboard:v3.2rc8
+    ports:
+      - "3000"
+    depends_on:
+      - "redis"
+      - "mongo"
+    volumes:
+      - ./tyk_analytics.with_mongo_and_gateway.conf:/opt/tyk-dashboard/tyk_analytics.conf
+  tyk_gateway:
+    image: tykio/tyk-gateway:v3.2.1
+    ports:
+      - "8080"
+    depends_on:
+      - "tyk_dashboard"
+    volumes:
+      - ./tyk.with_dashboard.conf:/opt/tyk-gateway/tyk.conf
+      - ./plugin:/root/plugin
+  tyk_build:
+    image: tykio/tyk-gateway:v3.2.1
+    depends_on:
+      - "tyk_dashboard"
+    volumes:
+      - ./tyk.standalone.conf:/opt/tyk-gateway/tyk.conf
+      - ./plugin:/root/plugin
