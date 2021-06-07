@@ -12,7 +12,7 @@ services:
   tyk_dashboard:
     image: tykio/tyk-dashboard:v3.2rc8
     ports:
-      - "3000"
+      - "3000:3000"
     depends_on:
       - "redis"
       - "mongo"
@@ -21,7 +21,7 @@ services:
   tyk_gateway:
     image: tykio/tyk-gateway:v3.2.1
     ports:
-      - "8080"
+      - "8080:8080"
     depends_on:
       - "tyk_dashboard"
     volumes:
@@ -34,3 +34,11 @@ services:
     volumes:
       - ./tyk.standalone.conf:/opt/tyk-gateway/tyk.conf
       - ./plugin:/root/plugin
+    logging:
+          driver: none
+  tyk_pump:
+    image: tykio/tyk-pump-docker-pub:v1.3.0
+    depends_on:
+      - "tyk_dashboard"
+    volumes:
+      - ./tyk-pump.conf:/opt/tyk-pump/tyk-pump.conf

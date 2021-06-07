@@ -9,18 +9,24 @@ for lib_dir in [ 'vendor/lib/python3.7/site-packages/' ]:
   sys.path.append(vendor_dir)
 
 import jwt
-#import redis
+import json
+import requests
 import datetime
 
 @Hook
 def ResponseHook(request, response, session, metadata, spec):
   logLevel = "info"
   tyk.log("ResponseHook START", logLevel)
+  # decode the response from upstream. Should contain the auth token we key on
+  token = response.raw_body.decode()
+  # the time that the JWT lives in redis
   tokenLife = 1*60
+  # Load the certificate. Stored in the bundle but could be a string in this file too
   cert_file = "jwt-signing-key.pem"
   cert_file = os.path.join(bundle_dir, cert_file)
   private_key = open(cert_file).read()
-  #r = redis.Redis(host="localhost",db=1)
+  # load the config data from the API definition
+  api_config_data = json.loads(spec['config_data'])
   # show all the data structures
   #tyk.log("ResponseHook request object: " + str(vars(request)), logLevel)
   #tyk.log("ResponseHook response object: " + str(response), logLevel)
@@ -28,13 +34,26 @@ def ResponseHook(request, response, session, metadata, spec):
   #tyk.log("ResponseHook metadata object: " + str(metadata), logLevel)
   #tyk.log("ResponseHook spec object: " + str(spec), logLevel)
   #tyk.log("ResponseHook: upstream returned {0}".format(response.status_code), logLevel)
-  # Attach a new response header:
-  token = response.raw_body.decode()
-  #jot = jwt.encode({'scope': 'universal', 'sub': 'sub', 'client_id': 'mobile_apps', 'token': token, 'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=tokenLife), "iat": datetime.datetime.utcnow()}, "FredPassword")
-  jot = jwt.encode({'scope': 'universal', 'sub': 'sub', 'client_id': 'mobile_apps', 'token': token, 'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=tokenLife), "iat": datetime.datetime.utcnow()}, private_key, algorithm='RS256')
-  #r.setex(response.raw_body, timedelta(minutes=1), value="Fred was here")
-  tyk.store_data(token, jot, tokenLife)
-  tyk.log("ResponseHook: from redis " + tyk.get_data(token).decode(), logLevel)
+  # show the config_data fields
+  #tyk.log("config_data is: " + spec['config_data'], logLevel)
+  #tyk.log("analytics is: " + api_config_data['analytics'], logLevel)
+  #tyk.log("introspect URL is: " + introspect_URL, logLevel)
+  introspect_URL = api_config_data['introspect']
+  analytics_field = api_config_data['analytics']
+  introspect_params = {'token': token }
+  # connect to the introspection URL and introspect the token
+  introspection = requests.get(introspect_URL, params=introspect_params)
+  introspect_data = json.loads(introspection.text)
+  # log the details for debugging
+  #tyk.log("Introspection: " + introspection.text, logLevel)
+  #tyk.log("analytics_field: " + analytics_field, logLevel)
+  #tyk.log("analytics_value: " + introspect_data[analytics_field], logLevel)
+  # build the jwt
+  j = jwt.encode({'scope': 'universal', 'sub': 'Subject', analytics_field: introspect_data[analytics_field], 'token': token, 'exp': introspect_data['exp'], "iat": datetime.datetime.utcnow()}, private_key, algorithm='RS256')
+  # save to redis
+  tyk.store_data(token, j, tokenLife)
+  tyk.log("JWT: " + j, logLevel)
+  # stick the token into the headers for good measure
   response.headers["Hydra-Token"] = token
   tyk.log("ResponseHook END", logLevel)
   return response
