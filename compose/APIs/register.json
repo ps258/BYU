@@ -364,7 +364,8 @@
     "config_data": {
         "analytics": "client_id",
         "introspect": "http://localhost:8080/introspect/",
-        "people": "http://localhost:8080/people/"
+        "people": "http://localhost:8080/people/",
+        "token_life": 1800
     },
     "tag_headers": [],
     "global_rate_limit": {

@@ -20,7 +20,6 @@ def ResponseHook(request, response, session, metadata, spec):
   # decode the response from upstream. Should contain the auth token we key on
   token = response.raw_body.decode()
   # the time that the JWT lives in redis
-  tokenLife = 1*60
   # Load the certificate. Stored in the bundle but could be a string in this file too
   cert_file = "jwt-signing-key.pem"
   cert_file = os.path.join(bundle_dir, cert_file)
@@ -40,6 +39,7 @@ def ResponseHook(request, response, session, metadata, spec):
   #tyk.log("introspect URL is: " + introspect_URL, logLevel)
   introspect_URL = api_config_data['introspect']
   analytics_field = api_config_data['analytics']
+  tokenLife = api_config_data['token_life']
   introspect_params = {'token': token }
   # connect to the introspection URL and introspect the token
   introspection = requests.get(introspect_URL, params=introspect_params)
