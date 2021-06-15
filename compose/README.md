@@ -16,7 +16,7 @@ This creates:
 - compose_tyk_build_1 to build the bundles and serve them to compose_tyk_gateway_1
 
 ### Install a dashboard licence and setup some mock APIs.
-This demo doesn't provide the API but the bundles will be called register.zip and auth.zip
+This demo provides the full set of APIs to play with.
 
 ### Update compose_tyk_build_1 to have the tools needed
 ```bash
@@ -34,3 +34,10 @@ docker container exec -it compose_tyk_build_1 /root/plugin/build.sh
 ```bash
 ./publish
 ```
+
+### Get a token
+$ curl http://localhost:8080/register/
+b4bebbb98ea7a93850da7bb4b15dcc6a
+
+### Use that token to call the 'protected' API
+curl  http://localhost:8080/protected/get -H 'Authorization: b4bebbb98ea7a93850da7bb4b15dcc6a'
