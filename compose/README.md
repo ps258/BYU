@@ -36,8 +36,12 @@ docker container exec -it compose_tyk_build_1 /root/plugin/build.sh
 ```
 
 ### Get a token
+```bash
 $ curl http://localhost:8080/register/
 b4bebbb98ea7a93850da7bb4b15dcc6a
+```
 
 ### Use that token to call the 'protected' API
+```bash
 curl  http://localhost:8080/protected/get -H 'Authorization: b4bebbb98ea7a93850da7bb4b15dcc6a'
+```
