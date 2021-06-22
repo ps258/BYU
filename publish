@@ -1,9 +1,0 @@
-#!/bin/bash
-
-echo restarting tyk_dashboard
-/scripts/stop-dashboard.sh
-/scripts/start-dashboard.sh
-echo restarting tyk_gateway
-/scripts/stop-gateway.sh
-/scripts/start-gateway.sh
-tail -f /var/log/tyk_gateway.log
