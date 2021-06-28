@@ -13,17 +13,18 @@ import json
 import requests
 import datetime
 
+# Load the certificate. Stored in the bundle but could be a string in this file too
+cert_file = "jwt-signing-key.pem"
+cert_file = os.path.join(bundle_dir, cert_file)
+private_key = open(cert_file).read()
+
 @Hook
 def ResponseHook(request, response, session, metadata, spec):
   logLevel = "info"
   tyk.log("ResponseHook START", logLevel)
   # decode the response from upstream. Should contain the auth token we key on
-  token = response.raw_body.decode()
   # the time that the JWT lives in redis
-  # Load the certificate. Stored in the bundle but could be a string in this file too
-  cert_file = "jwt-signing-key.pem"
-  cert_file = os.path.join(bundle_dir, cert_file)
-  private_key = open(cert_file).read()
+  token = response.raw_body.decode()
   # load the config data from the API definition
   api_config_data = json.loads(spec['config_data'])
   # show all the data structures
