@@ -1,10 +1,18 @@
 #!/bin/bash
 
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
+OS=$(uname -s)
 
 #find the local IP address (use the interface of the default route)
-default_dev=$(ip route list | awk '$1 == "default" {print $5}')
-IP_addr=$(ip addr show dev $default_dev | awk '$1 == "inet" {print $2}' | cut -d/ -f1)
+if [[ $OS == "Linux" ]]
+then
+  default_dev=$(ip route list | sed 's/none //' | awk '/default/ {print $5}')
+  IP_addr=$(ip addr show dev $default_dev | awk '$1 == "inet" {print $2}' | head -1 | cut -d/ -f1)
+elif [[ $OS == "Darwin" ]]
+then
+  default_dev=$(netstat -rnf inet | awk '/^default/{print $NF}')
+  IP_addr=$(ipconfig getifaddr $default_dev)
+fi
 
 #DASHBOARD=$(uname -n)
 #GATEWAY=$(uname -n)
