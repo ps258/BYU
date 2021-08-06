@@ -5,6 +5,7 @@
 
 ### Create the containers
 ```bash
+cd compose
 docker-compose up -d
 ```
 
