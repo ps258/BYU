@@ -44,5 +44,11 @@ b4bebbb98ea7a93850da7bb4b15dcc6a
 
 ### Use that token to call the 'protected' API
 ```bash
-curl  http://localhost:8080/protected/get -H 'Authorization: b4bebbb98ea7a93850da7bb4b15dcc6a'
+curl http://localhost:8080/protected/get -H 'Authorization: b4bebbb98ea7a93850da7bb4b15dcc6a'
+```
+
+### Introspect the token
+```bash
+curl http://localhost:8080/introspect/?token=b4bebbb98ea7a93850da7bb4b15dcc6a
+{"client_id":"office_apps","exp":1637312279}
 ```
